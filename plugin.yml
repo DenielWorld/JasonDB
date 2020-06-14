@@ -1,0 +1,6 @@
+name: JasonDB
+author: DenielWorld
+api: [3.0.0, 4.0.0]
+version: 0.1.0
+main: DenielWorld\JasonDB\JasonDB
+description: "A better way to store your JaSON"
