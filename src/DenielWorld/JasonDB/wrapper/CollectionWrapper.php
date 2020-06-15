@@ -7,6 +7,9 @@ class CollectionWrapper{
     /** @var \MongoCollection */
     private $collection;
 
+    /** @var null|string */
+    private $lastError;
+
     /**
      * CollectionWrapper constructor.
      * @param \MongoCollection $collection
@@ -18,11 +21,15 @@ class CollectionWrapper{
     }
 
     /**
+     * @return null|string Since all the exceptions are caught for safety purposes, the last error gets logged and can be retrieved with this method.
+     */
+    public function getLastError() : ?string{
+        return $this->lastError;
+    }
+
+    /**
      * @param string $key
      * @param mixed $value
-     *
-     * @throws \MongoCursorException
-     * @throws \MongoException
      */
     public function setNested(string $key, $value) : void{
         $vars = explode(".", $key); $mainKey = array_shift($vars);
@@ -78,8 +85,6 @@ class CollectionWrapper{
 
     /**
      * @param string $key
-     *
-     * @throws \MongoCursorException
      */
     public function removeNested(string $key) : void{
         $vars = explode(".", $key); $mainKey = array_shift($vars);
@@ -101,7 +106,12 @@ class CollectionWrapper{
         }
 
         unset($base);
-        $this->collection->update(["key" => $mainKey], ['$set' => ["data" => $doc]]);
+        try {
+            $this->collection->update(["key" => $mainKey], ['$set' => ["data" => $doc]]);
+        } catch (\MongoCursorException $exception){
+            $this->lastError = $exception->__toString();
+            //Preventing the DB from shitting itself lmao
+        }
     }
 
     /**
@@ -117,26 +127,35 @@ class CollectionWrapper{
     /**
      * @param string|int $key
      * @param mixed $value
-     *
-     * @throws \MongoCursorException
-     * @throws \MongoCursorTimeoutException
-     * @throws \MongoException
      */
     public function set($key, $value) : void{
         if(is_null($this->collection->findOne(["key" => $key]))) {
-            $this->collection->insert(["key" => $key, "data" => $value]);
+            try {
+                $this->collection->insert(["key" => $key, "data" => $value]);
+            } catch (\MongoException $exception){
+                $this->lastError = $exception->__toString();
+                //Preventing the DB from shitting itself lmao
+            }
         } else {
-            $this->collection->update(["key" => $key], ['$set' => ["data" => $value]]);
+            try {
+                $this->collection->update(["key" => $key], ['$set' => ["data" => $value]]);
+            } catch (\MongoCursorException $exception){
+                $this->lastError = $exception->__toString();
+                //Preventing the DB from shitting itself lmao
+            }
         }
     }
 
     /**
      * @param mixed $value
-     *
-     * @throws \MongoCursorException
      */
     public function setAll($value) : void{
-        $this->collection->update([], ['$set' => ["data" => $value]], ["multiple" => true]);
+        try {
+            $this->collection->update([], ['$set' => ["data" => $value]], ["multiple" => true]);
+        } catch (\MongoCursorException $exception){
+            $this->lastError = $exception->__toString();
+            //Preventing the DB from shitting itself lmao
+        }
     }
 
     /**
@@ -150,12 +169,14 @@ class CollectionWrapper{
 
     /**
      * @param string $key
-     *
-     * @throws \MongoCursorException
-     * @throws \MongoCursorTimeoutException
      */
     public function remove(string $key) : void{
+        try {
         $this->collection->remove(["key" => $key]);
+        } catch (\MongoCursorException $exception){
+            $this->lastError = $exception->__toString();
+            //Preventing the DB from shitting itself lmao
+        }
     }
 
     /**

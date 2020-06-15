@@ -63,8 +63,9 @@ involve making a task with the following code.
 class ExampleAsyncDBTask extends DenielWorld\JasonDB\task\AsyncDBTask{
 
     public function onRun() : void{
-        //Database handling code - Setting, Removing, Getting, etc.
-        //No init() needed here.
+        parent::onRun(); //This line is very important for functionality!
+
+        //Database handling code - Setting, Removing, Getting, whatever you want.
     }
 
 }
@@ -166,3 +167,68 @@ $collection->exists("DenielWorld");
 //true. Otherwise will return false.
 $collection->exists("DenielWorld.level");
 ```
+
+## Extended API
+
+In the following section, some of the more advanced parts of
+the API will be showcased.
+
+By default, the DatabaseManager always attempts to manage
+data from your local MongoDB.
+
+Although, you can create additional MongoDB connections,
+using the following code.
+
+```php
+\DenielWorld\JasonDB\DatabaseManager::createAdditionalClient("exampleConnection", "mongodb://localhost:27017", ["connect" => TRUE]);
+```
+
+The first parameter is the name you wish to give your new
+connection. You may use this name later on in your code to
+retrieve databases from this connection.
+
+The second parameter is an encoded URL for your connection.
+Don't know how to encode URLs? Not a problem, because PHP
+has a handy function for that called ``rawurlencode()``.
+The first and only parameter of that function is your URL,
+easy enough?
+
+The third parameter is additional URL options for your
+connection, you should only mess with that if you know
+what you are doing.
+
+After your new connection is established, you may create
+and retrieve databases from it. The following code will
+show an example.
+
+```php
+\DenielWorld\JasonDB\DatabaseManager::getDatabaseFrom("exampleConnection", "testDb");
+```
+
+In the code above, the first parameter is the name of your
+newly established MongoDB connection.
+
+The second parameter is the name of a database that you
+either want to create or retrieve from the connection.
+Either way, the according DatabaseWrapper will be returned.
+
+At last, I would like to underline that for safety reasons,
+the CollectionWrapper will not throw any exceptions, which
+is why if your code does not work properly, you won't know
+exactly why.
+
+If you need to debug your code and see what doesn't work
+properly with your CollectionWrapper, you can use the
+following code.
+
+```php
+//$collection has been referenced in a previous example.
+$errorMessage = $collection->getLastError();
+```
+
+When an exception is caught by the CollectionWrapper, a
+complete error message of that exception is logged, and
+can be retrieved with the method shown above. Using that,
+you may find out where your last error has occurred and
+for what reason, and if it turns out to be a bug on the
+end of JasonDB, you can always open an issue to report it.

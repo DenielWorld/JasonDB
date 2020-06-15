@@ -7,11 +7,7 @@ use pocketmine\scheduler\AsyncTask;
 
 abstract class AsyncDBTask extends AsyncTask{
 
-    /**
-     * AsyncDBTask constructor.
-     * @throws \MongoConnectionException
-     */
-    public function __construct()
+    public function onRun() : void
     {
         DatabaseManager::init();
     }
