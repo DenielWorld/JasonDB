@@ -20,6 +20,13 @@ class DatabaseWrapper{
     }
 
     /**
+     * @return \MongoDB
+     */
+    public function asDatabase() : \MongoDB{
+        return $this->db;
+    }
+
+    /**
      * @param string $collectionName
      *
      * @return CollectionWrapper

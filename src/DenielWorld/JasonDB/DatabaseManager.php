@@ -66,4 +66,18 @@ class DatabaseManager{
     public static function createAdditionalClient(string $clientName, string $uri, array $uriOptions = ["connect" => TRUE]) : void{
         self::$additionalMongoClients[$clientName] = new \MongoDB\Driver\Manager($uri, $uriOptions);
     }
+
+    /**
+     * @param string|null $clientName If null, the default connection is returned.
+     *
+     * @return \MongoDB\Driver\Manager|null Returns null if the connection with the given $clientName is not found.
+     */
+    public static function getClient(?string $clientName = null) : ?\MongoDB\Driver\Manager{
+        if(is_null($clientName))
+            return self::$mongoClient;
+        if(isset(self::$additionalMongoClients[$clientName]))
+            return self::$additionalMongoClients[$clientName];
+
+        return null;
+    }
 }

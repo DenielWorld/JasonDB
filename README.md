@@ -232,3 +232,36 @@ can be retrieved with the method shown above. Using that,
 you may find out where your last error has occurred and
 for what reason, and if it turns out to be a bug on the
 end of JasonDB, you can always open an issue to report it.
+
+If you wish to make use of a MongoDB connection client
+directly, you can use the following code.
+
+```php
+$defaultConnection = \DenielWorld\JasonDB\DatabaseManager::getClient();
+
+$newConnection = \DenielWorld\JasonDB\DatabaseManager::getClient("exampleConnection");
+```
+
+If you wish to make use of a Database directly, you can use
+the following code.
+
+```php
+//$db has been referenced in previous examples.
+$actualDatabase = $db->asDatabase();
+```
+
+If you wish to make use of a Collection directly, you can
+use the following code.
+
+```php
+//$collection has been referenced in previous examples.
+$actualCollection = $db->asCollection();
+```
+
+The three examples above allow you to get the MongoDB
+connection clients, Databases, and Collections from outside
+their wrappers for direct use. This means that at the point
+where you make direct use of them, the API no longer secures
+your code. If you do not know exactly what you are doing,
+or how to make use of these classes directly, please refrain
+from doing so.

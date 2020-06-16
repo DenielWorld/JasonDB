@@ -21,6 +21,13 @@ class CollectionWrapper{
     }
 
     /**
+     * @return \MongoCollection
+     */
+    public function asCollection() : \MongoCollection{
+        return $this->collection;
+    }
+
+    /**
      * @return null|string Since all the exceptions are caught for safety purposes, the last error gets logged and can be retrieved with this method.
      */
     public function getLastError() : ?string{
